@@ -1,0 +1,82 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  font-family: "Montserrat", sans-serif;
+}
+
+.calendar-wrap {
+  border-top: 5px solid #ebab34;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 0 24px;
+}
+
+/* nav bar section */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0 24px 0;
+}
+
+.chronology-nav-container {
+  display: flex;
+}
+
+.calendar-title-container {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.custom-btn-list {
+  display: flex;
+}
+
+/* custom button */
+.custom-btn {
+  background-color: hsl(224, 100%, 57%);
+  border: none;
+  color: white;
+  padding: 10px;
+}
+
+.custom-btn:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.custom-btn:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.custom-btn:active {
+  background-color: hsl(224, 73%, 45%);
+}
+
+/*calendar section*/
+.calendar-table {
+  border-collapse: collapse;
+}
+
+.days-titles th {
+  padding: 5px;
+}
+
+.calendar-table td,
+th {
+  border: 1px solid rgb(158, 158, 158);
+}
+
+.days-sections-wrap td {
+  height: 12vh;
+  vertical-align: top;
+}
+
+.day-number {
+  padding: 3px;
+  text-align: end;
+}
+
+.inactive {
+  color: rgb(158, 158, 158);
+}
