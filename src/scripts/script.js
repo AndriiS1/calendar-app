@@ -1,18 +1,18 @@
 const currentDate = new Date();
-const currentMonth = currentDate.getMonth() + 1;
-const firstDayOfMonth = new Date(
+let currentMonth = currentDate.getMonth() + 1;
+let firstDayOfMonth = new Date(
   currentDate.getFullYear(),
   currentDate.getMonth(),
   1
 ).getDay();
 
-const numberOfDaysInMonth = new Date(
+let numberOfDaysInMonth = new Date(
   currentDate.getFullYear(),
   currentMonth,
   0
 ).getDate();
 
-const numberOfDaysInPreviousMonth = new Date(
+let numberOfDaysInPreviousMonth = new Date(
   currentDate.getFullYear(),
   currentMonth - 1,
   0
@@ -34,7 +34,7 @@ const addInactiveClassToDay = (day) => {
 
 /**
  * Generates the first section of the calendar.
- * @returns {HTMLElement} The generated HTML element representing the first section of the calendar.
+ * @returns {HTMLTableRowElement} The generated HTML element representing the first section of the calendar.
  */
 const generateFirstSection = () => {
   const daysSectionsWrap = document.createElement("tr");
@@ -52,6 +52,11 @@ const generateFirstSection = () => {
   return daysSectionsWrap;
 };
 
+/**
+ * Generates a section containing seven days starting from the specified day.
+ * @param {number} start - The starting day.
+ * @returns {HTMLTableRowElement} - The generated section containing seven days.
+ */
 const generateSevenDaySection = (start) => {
   const daysSectionsWrap = document.createElement("tr");
   daysSectionsWrap.classList.add("days-sections-wrap");
@@ -61,6 +66,12 @@ const generateSevenDaySection = (start) => {
   return daysSectionsWrap;
 };
 
+/**
+ * Generates the last section of the calendar table.
+ *
+ * @param {number} start - The starting day of the last section.
+ * @returns {HTMLTableRowElement} - The generated HTML table row element representing the last section.
+ */
 const generateLastSection = (start) => {
   const daysSectionsWrap = document.createElement("tr");
   daysSectionsWrap.classList.add("days-sections-wrap");
@@ -91,9 +102,68 @@ const displayDays = () => {
   calendarBody.appendChild(generateLastSection(lastI + 7));
 };
 
+const resetCalendar = () => {
+  const calendarBody = document.querySelector("tbody");
+  while (calendarBody.hasChildNodes()) {
+    calendarBody.removeChild(calendarBody.lastChild);
+  }
+};
+
 const initializeCalendar = () => {
   displayDays();
   displayCalendarSectionTitle();
 };
 
 initializeCalendar();
+
+const prevMonthBtn = document.querySelector("#prev-month-btn");
+const nextMonthBtn = document.querySelector("#next-month-btn");
+
+prevMonthBtn.addEventListener("click", () => {
+  resetCalendar();
+  currentDate.setMonth(currentMonth - 2);
+  currentMonth = currentDate.getMonth() + 1;
+  firstDayOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  ).getDay();
+
+  numberOfDaysInMonth = new Date(
+    currentDate.getFullYear(),
+    currentMonth,
+    0
+  ).getDate();
+
+  numberOfDaysInPreviousMonth = new Date(
+    currentDate.getFullYear(),
+    currentMonth - 1,
+    0
+  ).getDate();
+  initializeCalendar();
+});
+
+nextMonthBtn.addEventListener("click", () => {
+  resetCalendar();
+  currentDate.setMonth(currentMonth);
+  console.log(currentMonth);
+  currentMonth = currentDate.getMonth() + 1;
+  firstDayOfMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
+  ).getDay();
+
+  numberOfDaysInMonth = new Date(
+    currentDate.getFullYear(),
+    currentMonth,
+    0
+  ).getDate();
+
+  numberOfDaysInPreviousMonth = new Date(
+    currentDate.getFullYear(),
+    currentMonth - 1,
+    0
+  ).getDate();
+  initializeCalendar();
+});
