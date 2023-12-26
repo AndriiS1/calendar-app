@@ -27,7 +27,7 @@ const generateDay = (dayNumber) => {
   return td;
 };
 
-const makeInactiveDay = (day) => {
+const addInactiveClassToDay = (day) => {
   day.classList.add("inactive");
   return day;
 };
@@ -44,7 +44,7 @@ const generateFirstSection = () => {
     i < numberOfDaysInPreviousMonth;
     i++
   ) {
-    daysSectionsWrap.appendChild(makeInactiveDay(generateDay(i + 1)));
+    daysSectionsWrap.appendChild(addInactiveClassToDay(generateDay(i + 1)));
   }
   for (let i = 0; i < 7 - firstDayOfMonth; i++) {
     daysSectionsWrap.appendChild(generateDay(i + 1));
@@ -68,7 +68,7 @@ const generateLastSection = (start) => {
     daysSectionsWrap.appendChild(generateDay(i + 1));
   }
   for (let i = 0; i < 7 - (numberOfDaysInMonth - start); i++) {
-    daysSectionsWrap.appendChild(makeInactiveDay(generateDay(i + 1)));
+    daysSectionsWrap.appendChild(addInactiveClassToDay(generateDay(i + 1)));
   }
   return daysSectionsWrap;
 };
@@ -96,4 +96,4 @@ const initializeCalendar = () => {
   displayCalendarSectionTitle();
 };
 
-document.addEventListener("DOMContentLoaded", initializeCalendar);
+initializeCalendar();
