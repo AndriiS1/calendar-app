@@ -133,6 +133,48 @@ calendarManager.showCalendar();
 
 const prevMonthBtn = document.querySelector("#prev-month-btn");
 const nextMonthBtn = document.querySelector("#next-month-btn");
+const modal = document.querySelector(".modal");
+const overlay = document.querySelector(".overlay");
+
+const closeModal = function () {
+  modal.classList.add("hidden");
+  overlay.classList.add("hidden");
+};
+
+const openModal = function () {
+  modal.classList.remove("hidden");
+  overlay.classList.remove("hidden");
+  modal.querySelector(".modal-content").innerHTML = "";
+};
+
+const assignAddNoteForEachDay = function () {
+  const allDaysCells = document.querySelectorAll("td");
+  allDaysCells.forEach((e) =>
+    e.addEventListener("click", function () {
+      openModal();
+      createModalContent(Number(this.querySelector(".day-number").textContent));
+    })
+  );
+};
+
+const createModalContent = function (dayNumber) {
+  const currentYear = calendarManager.currentDate.toLocaleString("en-US", {
+    year: "numeric",
+  });
+  const currentMonth = calendarManager.currentDate.toLocaleString("en-US", {
+    month: "long",
+  });
+  const html = `<div class="modal-title">Add a note to <SetProperDayOfWeek>, ${currentMonth} ${dayNumber}, ${currentYear}.</div>
+  <input class="modal-input" />
+  <button>submit</button>`;
+  modal.querySelector(".modal-content").insertAdjacentHTML("afterbegin", html);
+};
+
+assignAddNoteForEachDay();
+
+overlay.addEventListener("click", function () {
+  closeModal();
+});
 
 prevMonthBtn.addEventListener("click", () => {
   calendarManager.resetCalendar();
@@ -140,6 +182,7 @@ prevMonthBtn.addEventListener("click", () => {
   newDate.setMonth(calendarManager.currentMonth - 2);
   calendarManager.setDateRelatedVars(newDate);
   calendarManager.showCalendar();
+  assignAddNoteForEachDay();
 });
 
 nextMonthBtn.addEventListener("click", () => {
@@ -148,4 +191,5 @@ nextMonthBtn.addEventListener("click", () => {
   newDate.setMonth(calendarManager.currentMonth);
   calendarManager.setDateRelatedVars(newDate);
   calendarManager.showCalendar();
+  assignAddNoteForEachDay();
 });
