@@ -137,3 +137,11 @@ th {
 .inactive {
   color: rgb(158, 158, 158);
 }
+
+.day-note {
+  background-color: hsl(224, 100%, 57%);
+  border-radius: 3px;
+  padding: 2px;
+  margin: 1px;
+  color: white;
+}

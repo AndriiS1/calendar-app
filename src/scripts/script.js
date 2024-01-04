@@ -33,6 +33,35 @@ class CalendarManager {
     td.appendChild(div);
     return td;
   }
+
+  displayNotes = () => {
+    const dayCells = document.querySelectorAll("td");
+    for (let dayCell of dayCells) {
+      if (!dayCell.classList.contains("inactive")) {
+        const dayNumber = Number(
+          dayCell.querySelector(".day-number").textContent
+        );
+        const specificDayDate = this.generateNoteDate(dayNumber);
+        const result = JSON.parse(
+          localStorage.getItem("userNotes")
+        ).notes.filter((item) => {
+          const itemDate = new Date(item.date);
+          return (
+            itemDate.getFullYear() === specificDayDate.getFullYear() &&
+            itemDate.getMonth() === specificDayDate.getMonth() &&
+            itemDate.getDate() === specificDayDate.getDate()
+          );
+        });
+        result?.forEach((n) => {
+          const noteDiv = document.createElement("div");
+          noteDiv.classList.add("day-note");
+          noteDiv.textContent = String(n.description);
+          dayCell.appendChild(noteDiv);
+        });
+      }
+    }
+  };
+
   #addInactiveClassToDay = (day) => {
     day.classList.add("inactive");
     return day;
@@ -115,6 +144,17 @@ class CalendarManager {
     calendarBody.appendChild(this.#generateLastSection(lastI + 7));
   };
 
+  generateNoteDate = (dayNumber) => {
+    const date = new Date(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth(),
+      dayNumber,
+      0
+    );
+    date.setMinutes(date.getMinutes() - this.currentDate.getTimezoneOffset());
+    return date;
+  };
+
   resetCalendar = () => {
     const calendarBody = document.querySelector("tbody");
     while (calendarBody.hasChildNodes()) {
@@ -125,6 +165,7 @@ class CalendarManager {
   showCalendar = () => {
     this.#displayDays();
     this.#displayCalendarSectionTitle();
+    this.displayNotes();
   };
 }
 
@@ -188,6 +229,15 @@ const displayNextMonth = function () {
   assignAddNoteForEachDay();
 };
 
+const addNoteHandler = function (dayNumber) {
+  const description = document.querySelector(".modal-input").value;
+  localStorageManager.addNoteToStorage(
+    calendarManager.generateNoteDate(dayNumber),
+    description
+  );
+  closeModal();
+};
+
 const createModalContent = function (dayNumber) {
   const currentYear = calendarManager.currentDate.toLocaleString("en-US", {
     year: "numeric",
@@ -201,19 +251,8 @@ const createModalContent = function (dayNumber) {
   modal.querySelector(".modal-content").insertAdjacentHTML("afterbegin", html);
 
   const addNoteBtn = document.querySelector(".add-note-btn");
-  addNoteBtn.addEventListener("click", function () {
-    const description = document.querySelector(".modal-input").value;
-    const date = new Date(
-      calendarManager.currentDate.getFullYear(),
-      calendarManager.currentDate.getMonth(),
-      dayNumber,
-      0
-    );
-    date.setMinutes(
-      date.getMinutes() - calendarManager.currentDate.getTimezoneOffset()
-    );
-    localStorageManager.addNoteToStorage(date, description);
-    closeModal();
+  addNoteBtn.addEventListener("click", () => {
+    addNoteHandler(dayNumber);
   });
 };
 
