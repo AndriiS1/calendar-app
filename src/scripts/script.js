@@ -34,7 +34,7 @@ class CalendarManager {
     return td;
   }
 
-  displayNotes = () => {
+  #displayNotes = () => {
     const dayCells = document.querySelectorAll("td");
     for (let dayCell of dayCells) {
       if (!dayCell.classList.contains("inactive")) {
@@ -131,6 +131,7 @@ class CalendarManager {
 
   #displayDays = () => {
     const calendarBody = document.querySelector("tbody");
+    calendarBody.innerHTML = "";
     calendarBody.appendChild(this.#generateFirstSection());
     let lastI = 0;
     for (
@@ -165,7 +166,7 @@ class CalendarManager {
   showCalendar = () => {
     this.#displayDays();
     this.#displayCalendarSectionTitle();
-    this.displayNotes();
+    this.#displayNotes();
   };
 }
 
@@ -236,6 +237,8 @@ const addNoteHandler = function (dayNumber) {
     description
   );
   closeModal();
+  calendarManager.showCalendar();
+  assignAddNoteForEachDay();
 };
 
 const createModalContent = function (dayNumber) {
@@ -258,12 +261,16 @@ const createModalContent = function (dayNumber) {
 
 const assignAddNoteForEachDay = function () {
   const allDaysCells = document.querySelectorAll("td");
-  allDaysCells.forEach((e) =>
-    e.addEventListener("click", function () {
-      openModal();
-      createModalContent(Number(this.querySelector(".day-number").textContent));
-    })
-  );
+  allDaysCells.forEach((e) => {
+    if (!e.classList.contains("inactive")) {
+      e.addEventListener("click", function () {
+        openModal();
+        createModalContent(
+          Number(this.querySelector(".day-number").textContent)
+        );
+      });
+    }
+  });
 };
 
 assignAddNoteForEachDay();
