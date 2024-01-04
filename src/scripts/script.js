@@ -128,7 +128,30 @@ class CalendarManager {
   };
 }
 
+class LocalStorageManager {
+  constructor() {
+    this.userNotes = JSON.parse(localStorage.getItem("userNotes")) || {
+      notes: [],
+    };
+    this.#updateStorage();
+    console.log(this.userNotes);
+  }
+
+  #updateStorage = () => {
+    localStorage.setItem("userNotes", JSON.stringify(this.userNotes));
+  };
+
+  addNoteToStorage = (date, description) => {
+    this.userNotes.notes.push({
+      date,
+      description,
+    });
+    this.#updateStorage();
+  };
+}
+
 const calendarManager = new CalendarManager();
+const localStorageManager = new LocalStorageManager();
 calendarManager.showCalendar();
 
 const prevMonthBtn = document.querySelector("#prev-month-btn");
@@ -147,14 +170,22 @@ const openModal = function () {
   modal.querySelector(".modal-content").innerHTML = "";
 };
 
-const assignAddNoteForEachDay = function () {
-  const allDaysCells = document.querySelectorAll("td");
-  allDaysCells.forEach((e) =>
-    e.addEventListener("click", function () {
-      openModal();
-      createModalContent(Number(this.querySelector(".day-number").textContent));
-    })
-  );
+const displayPrevMonth = function () {
+  calendarManager.resetCalendar();
+  newDate = calendarManager.currentDate;
+  newDate.setMonth(calendarManager.currentMonth - 2);
+  calendarManager.setDateRelatedVars(newDate);
+  calendarManager.showCalendar();
+  assignAddNoteForEachDay();
+};
+
+const displayNextMonth = function () {
+  calendarManager.resetCalendar();
+  newDate = calendarManager.currentDate;
+  newDate.setMonth(calendarManager.currentMonth);
+  calendarManager.setDateRelatedVars(newDate);
+  calendarManager.showCalendar();
+  assignAddNoteForEachDay();
 };
 
 const createModalContent = function (dayNumber) {
@@ -166,30 +197,40 @@ const createModalContent = function (dayNumber) {
   });
   const html = `<div class="modal-title">Add a note to <SetProperDayOfWeek>, ${currentMonth} ${dayNumber}, ${currentYear}.</div>
   <input class="modal-input" />
-  <button>submit</button>`;
+  <button class="add-note-btn">submit</button>`;
   modal.querySelector(".modal-content").insertAdjacentHTML("afterbegin", html);
+
+  const addNoteBtn = document.querySelector(".add-note-btn");
+  addNoteBtn.addEventListener("click", function () {
+    const description = document.querySelector(".modal-input").value;
+    const date = new Date(
+      calendarManager.currentDate.getFullYear(),
+      calendarManager.currentDate.getMonth(),
+      dayNumber,
+      0
+    );
+    date.setMinutes(
+      date.getMinutes() - calendarManager.currentDate.getTimezoneOffset()
+    );
+    localStorageManager.addNoteToStorage(date, description);
+    closeModal();
+  });
+};
+
+const assignAddNoteForEachDay = function () {
+  const allDaysCells = document.querySelectorAll("td");
+  allDaysCells.forEach((e) =>
+    e.addEventListener("click", function () {
+      openModal();
+      createModalContent(Number(this.querySelector(".day-number").textContent));
+    })
+  );
 };
 
 assignAddNoteForEachDay();
 
-overlay.addEventListener("click", function () {
-  closeModal();
-});
+overlay.addEventListener("click", closeModal);
 
-prevMonthBtn.addEventListener("click", () => {
-  calendarManager.resetCalendar();
-  newDate = calendarManager.currentDate;
-  newDate.setMonth(calendarManager.currentMonth - 2);
-  calendarManager.setDateRelatedVars(newDate);
-  calendarManager.showCalendar();
-  assignAddNoteForEachDay();
-});
+prevMonthBtn.addEventListener("click", displayPrevMonth);
 
-nextMonthBtn.addEventListener("click", () => {
-  calendarManager.resetCalendar();
-  newDate = calendarManager.currentDate;
-  newDate.setMonth(calendarManager.currentMonth);
-  calendarManager.setDateRelatedVars(newDate);
-  calendarManager.showCalendar();
-  assignAddNoteForEachDay();
-});
+nextMonthBtn.addEventListener("click", displayNextMonth);
