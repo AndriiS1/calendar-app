@@ -55,6 +55,7 @@ class CalendarManager {
         result?.forEach((n) => {
           const noteDiv = document.createElement("div");
           noteDiv.classList.add("day-note");
+          noteDiv.setAttribute("id", n.id);
           noteDiv.textContent = String(n.description);
           dayCell.appendChild(noteDiv);
         });
@@ -183,18 +184,27 @@ class LocalStorageManager {
     localStorage.setItem("userNotes", JSON.stringify(this.userNotes));
   };
 
-  addNoteToStorage = (date, description) => {
+  addNoteToStorage = (date, description, id = Number(new Date().valueOf())) => {
+    console.log(id);
     this.userNotes.notes.push({
+      id,
       date,
       description,
     });
+    this.#updateStorage();
+  };
+
+  deleteNoteFromStorage = (id) => {
+    console.log(id);
+    this.userNotes.notes = this.userNotes.notes.filter(
+      (note) => note.id !== id
+    );
     this.#updateStorage();
   };
 }
 
 const calendarManager = new CalendarManager();
 const localStorageManager = new LocalStorageManager();
-calendarManager.showCalendar();
 
 const prevMonthBtn = document.querySelector("#prev-month-btn");
 const nextMonthBtn = document.querySelector("#next-month-btn");
@@ -217,8 +227,7 @@ const displayPrevMonth = function () {
   newDate = calendarManager.currentDate;
   newDate.setMonth(calendarManager.currentMonth - 2);
   calendarManager.setDateRelatedVars(newDate);
-  calendarManager.showCalendar();
-  assignAddNoteForEachDay();
+  setActualData();
 };
 
 const displayNextMonth = function () {
@@ -226,8 +235,7 @@ const displayNextMonth = function () {
   newDate = calendarManager.currentDate;
   newDate.setMonth(calendarManager.currentMonth);
   calendarManager.setDateRelatedVars(newDate);
-  calendarManager.showCalendar();
-  assignAddNoteForEachDay();
+  setActualData();
 };
 
 const addNoteHandler = function (dayNumber) {
@@ -237,8 +245,7 @@ const addNoteHandler = function (dayNumber) {
     description
   );
   closeModal();
-  calendarManager.showCalendar();
-  assignAddNoteForEachDay();
+  setActualData();
 };
 
 const createModalContent = function (dayNumber) {
@@ -273,7 +280,46 @@ const assignAddNoteForEachDay = function () {
   });
 };
 
+const assignDragFunctionalForEachNote = function () {
+  const allNotes = document.querySelectorAll(".day-note");
+  allNotes.forEach((note) => {
+    note.draggable = true;
+    note.addEventListener("dragstart", function (e) {
+      e.dataTransfer.setData("id", Number(this.getAttribute("id")));
+      e.dataTransfer.setData("description", this.textContent);
+    });
+  });
+  const allDays = document.querySelectorAll("td");
+  allDays.forEach((d) => {
+    d.addEventListener("dragover", (e) => e.preventDefault());
+    d.addEventListener("drop", (e) => {
+      const newDate = calendarManager.generateNoteDate(
+        Number(d.querySelector(".day-number").textContent)
+      );
+      localStorageManager.deleteNoteFromStorage(
+        Number(e.dataTransfer.getData("id"))
+      );
+      localStorageManager.addNoteToStorage(
+        newDate,
+        e.dataTransfer.getData("description"),
+        Number(e.dataTransfer.getData("id"))
+      );
+      setActualData();
+    });
+  });
+};
+
+const setActualData = function () {
+  calendarManager.showCalendar();
+  assignAddNoteForEachDay();
+  assignDragFunctionalForEachNote();
+};
+
+setActualData();
+
 assignAddNoteForEachDay();
+
+assignDragFunctionalForEachNote();
 
 overlay.addEventListener("click", closeModal);
 
