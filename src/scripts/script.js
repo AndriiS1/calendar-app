@@ -215,7 +215,7 @@ const overlay = document.querySelector(".overlay");
 
 const initializeCalendar = function () {
   calendarManager.showCalendar();
-  assignAddNoteForEachDay();
+  addAssignNoteHandler();
   assignDragFunctionalForEachNote();
   assignDropFunctionalForEachDay();
 };
@@ -275,16 +275,15 @@ const createModalContent = function (dayNumber) {
   });
 };
 
-const assignAddNoteForEachDay = function () {
-  const allDaysCells = document.querySelectorAll("td");
-  allDaysCells.forEach((e) => {
-    if (!e.classList.contains("inactive")) {
-      e.addEventListener("click", function () {
-        openModal();
-        createModalContent(
-          Number(this.querySelector(".day-number").textContent)
-        );
-      });
+const addAssignNoteHandler = function () {
+  const calendarTable = document.querySelector(".calendar-table");
+  calendarTable.addEventListener("click", function (event) {
+    const target = event.target;
+    if (target.tagName === "TD" && !target.classList.contains("inactive")) {
+      openModal();
+      createModalContent(
+        Number(target.querySelector(".day-number").textContent)
+      );
     }
   });
 };
